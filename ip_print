@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+import sys
+import json
+import socket
+
+def check_ip(ip_addr):
+    if socket.inet_aton(ip_addr) or socket.inet_pton(socket.AF_INET6, ip_addr):
+        return 1
+    return 0
+# Handle IP v6 errors
+
+def main(argument_filename):
+    """
+    :param argument_filename: The file that contains the json content that has IP
+    :prints: Ip address and access IPv4
+    """
+    data_store = dict()
+    try:
+        with open(argument_filename, 'r') as file_open:
+            data_store = json.load(file_open)
+    except:
+        print("Invalid Filename '%s' supplied"%argument_filename)
+        exit(-1)
+    ip_address = dict()
+    for key_obj, value_obj in data_store['vm_private_ips']['value'].items():
+        try:
+            socket.inet_aton(value_obj) or socket.inet_pton(socket.AF_INET6, value_obj)
+            ip_address[key_obj] = [value_obj]
+        except:
+            print("Invalid IP found '%s'"%value_obj)
+    if "network" in data_store.keys():
+        for net_details in data_store['network']['vms']:
+            try:
+                if (net_details['attributes']['name'] in ip_address.keys()) and ((socket.inet_aton(net_details['attributes']['access_ip_v4'])) or (socket.inet_pton(socket.AF_INET6, net_details['attributes']['access_ip_v4']))):
+                    ip_address[net_details['attributes']['name']].append(net_details['attributes']['access_ip_v4'])
+            except:
+                print("Invalid IP found '%s'"%net_details['attributes']['access_ip_v4'])
+
+    for net_details in ip_address.items():
+        print('\t'.join(net_details[1]))
+    exit(0)
+
+
+if __name__ == "__main__":
+    if (len(sys.argv) != 2) or (sys.argv[1] in ["-h", "--help"]):
+        print("Usage: python ip_print.py FILENAME")
+        sys.exit(1)
+    else:
+        main(sys.argv[1])
