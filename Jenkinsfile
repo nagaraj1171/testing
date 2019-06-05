@@ -3,13 +3,12 @@ pipeline {
     stages {
         stage('input1') {
             steps {
-                sh("ls")
                 sh("./ip_print input1.json")
             }
         }
         stage('input2') {
             steps {
-                sh("./ip_print input1.json")
+                sh("./ip_print input2.json")
             }
         }
     }
