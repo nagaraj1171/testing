@@ -1,6 +1,5 @@
 pipeline {
     agent any
-    checkout scm
     stages {
         stage('input1') {
             steps {
