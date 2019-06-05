@@ -3,7 +3,9 @@ pipeline {
     stages {
         stage('input1') {
             steps {
-                sh("./ip_print input1.json")
+                sh("export PATH=$PATH:$(pwd)")
+                sh("chmod +x ip_print")
+                sh("ip_print input1.json")
             }
         }
         stage('input2') {
